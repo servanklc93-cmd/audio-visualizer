@@ -3,26 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VISUALIZER PRO</title>
+    <title>VISUALIZER 3D</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background: #000;
-            height: 100vh;
-            font-family: 'Courier New', monospace;
-            overflow: hidden;
-        }
-
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .ui {
+        body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+        canvas { display: block; }
+        #ui {
             position: fixed;
             bottom: 30px;
             left: 50%;
@@ -33,61 +19,7 @@
             gap: 12px;
             z-index: 10;
         }
-
-        .freq-bars {
-            display: flex;
-            gap: 20px;
-            background: rgba(0,0,0,0.5);
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .freq-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .freq-label {
-            font-size: 0.6rem;
-            letter-spacing: 2px;
-            color: rgba(255,255,255,0.4);
-        }
-
-        .freq-value {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: white;
-            min-width: 40px;
-            text-align: center;
-        }
-
-        .freq-bar-wrap {
-            width: 4px;
-            height: 40px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            overflow: hidden;
-            display: flex;
-            align-items: flex-end;
-        }
-
-        .freq-bar-fill {
-            width: 100%;
-            border-radius: 2px;
-            transition: height 0.1s;
-        }
-
-        .controls {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
+        .controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
         .btn {
             padding: 8px 16px;
             background: rgba(0,0,0,0.6);
@@ -97,16 +29,10 @@
             font-size: 0.7rem;
             letter-spacing: 1px;
             cursor: pointer;
-            transition: 0.2s;
             border-radius: 4px;
+            transition: 0.2s;
         }
-
-        .btn:hover, .btn.active {
-            border-color: white;
-            color: white;
-            background: rgba(255,255,255,0.1);
-        }
-
+        .btn:hover, .btn.active { border-color: white; color: white; background: rgba(255,255,255,0.1); }
         .upload-btn {
             padding: 10px 25px;
             background: rgba(255,255,255,0.1);
@@ -116,504 +42,476 @@
             font-size: 0.75rem;
             letter-spacing: 2px;
             cursor: pointer;
-            transition: 0.3s;
             border-radius: 4px;
+            transition: 0.3s;
         }
-
-        .upload-btn:hover {
-            background: white;
-            color: black;
-        }
-
-        .color-btns {
+        .upload-btn:hover { background: white; color: black; }
+        .track-name { color: rgba(255,255,255,0.35); font-size: 0.65rem; letter-spacing: 3px; }
+        .freq-bars {
             display: flex;
-            gap: 6px;
+            gap: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-
-        .color-btn {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .color-btn.active {
-            border-color: white;
-            transform: scale(1.2);
-        }
-
-        .track-name {
-            color: rgba(255,255,255,0.35);
-            font-size: 0.65rem;
-            letter-spacing: 3px;
-        }
-
-        .top-bar {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            z-index: 10;
-        }
-
-        .logo {
-            font-size: 0.75rem;
-            letter-spacing: 6px;
-            color: rgba(255,255,255,0.3);
-        }
-
-        .fullscreen-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 36px;
-            height: 36px;
+        .freq-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .freq-label { font-size: 0.6rem; letter-spacing: 2px; color: rgba(255,255,255,0.4); }
+        .freq-value { font-size: 0.9rem; font-weight: 700; color: white; min-width: 40px; text-align: center; }
+        .freq-bar-wrap { width: 4px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; display: flex; align-items: flex-end; }
+        .freq-bar-fill { width: 100%; border-radius: 2px; transition: height 0.05s; }
+        .color-btns { display: flex; gap: 6px; }
+        .color-btn { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: 0.2s; }
+        .color-btn.active { border-color: white; transform: scale(1.2); }
+        #fullscreenBtn {
+            position: fixed; top: 20px; right: 20px;
+            width: 36px; height: 36px;
             background: rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.2);
             color: rgba(255,255,255,0.6);
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            transition: 0.2s;
-            z-index: 10;
+            cursor: pointer; border-radius: 6px;
+            font-size: 0.9rem; z-index: 10;
         }
-
-        .fullscreen-btn:hover {
-            border-color: white;
-            color: white;
-        }
-
+        #fullscreenBtn:hover { border-color: white; color: white; }
         #fileInput { display: none; }
-
-        .beat-flash {
-            position: fixed;
-            inset: 0;
-            background: rgba(255,255,255,0);
-            pointer-events: none;
-            z-index: 5;
-            transition: background 0.05s;
-        }
+        .beat-flash { position: fixed; inset: 0; background: rgba(255,255,255,0); pointer-events: none; z-index: 5; transition: background 0.05s; }
     </style>
 </head>
 <body>
 
-    <canvas id="canvas"></canvas>
-    <div class="beat-flash" id="beatFlash"></div>
+<canvas id="canvas"></canvas>
+<div class="beat-flash" id="beatFlash"></div>
+<button id="fullscreenBtn">⛶</button>
 
-    <div class="top-bar">
-        <span class="logo">VISUALIZER PRO</span>
-    </div>
-
-    <button class="fullscreen-btn" id="fullscreenBtn">⛶</button>
-
-    <div class="ui">
-        <p class="track-name" id="trackName">MÜZİK DOSYASI SEÇ</p>
-
-        <div class="freq-bars" id="freqBars">
-            <div class="freq-item">
-                <div class="freq-bar-wrap">
-                    <div class="freq-bar-fill" id="bassBar" style="background:#ff4444;height:0%"></div>
-                </div>
-                <span class="freq-value" id="bassVal">0</span>
-                <span class="freq-label">BASS</span>
-            </div>
-            <div class="freq-item">
-                <div class="freq-bar-wrap">
-                    <div class="freq-bar-fill" id="midBar" style="background:#44ff88;height:0%"></div>
-                </div>
-                <span class="freq-value" id="midVal">0</span>
-                <span class="freq-label">MID</span>
-            </div>
-            <div class="freq-item">
-                <div class="freq-bar-wrap">
-                    <div class="freq-bar-fill" id="trebleBar" style="background:#4488ff;height:0%"></div>
-                </div>
-                <span class="freq-value" id="trebleVal">0</span>
-                <span class="freq-label">TREBLE</span>
-            </div>
+<div id="ui">
+    <p class="track-name" id="trackName">MÜZİK DOSYASI SEÇ</p>
+    <div class="freq-bars">
+        <div class="freq-item">
+            <div class="freq-bar-wrap"><div class="freq-bar-fill" id="bassBar" style="background:#ff4444;height:0%"></div></div>
+            <span class="freq-value" id="bassVal">0</span>
+            <span class="freq-label">BASS</span>
         </div>
-
-        <div class="controls">
-            <button class="btn active" data-style="bars">BARS</button>
-            <button class="btn" data-style="circle">CIRCLE</button>
-            <button class="btn" data-style="wave">WAVE</button>
-            <button class="btn" data-style="particles">PARTICLES</button>
-
-            <div class="color-btns">
-                <div class="color-btn active" data-color="rainbow" style="background: linear-gradient(135deg, red, yellow, green, blue, violet)"></div>
-                <div class="color-btn" data-color="fire" style="background: linear-gradient(135deg, #ff0000, #ff8800)"></div>
-                <div class="color-btn" data-color="ocean" style="background: linear-gradient(135deg, #0044ff, #00ffcc)"></div>
-                <div class="color-btn" data-color="neon" style="background: linear-gradient(135deg, #ff00ff, #00ffff)"></div>
-                <div class="color-btn" data-color="gold" style="background: linear-gradient(135deg, #ffd700, #ff8800)"></div>
-            </div>
-
-            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                ▶ MÜZİK YÜKLE
-            </button>
+        <div class="freq-item">
+            <div class="freq-bar-wrap"><div class="freq-bar-fill" id="midBar" style="background:#44ff88;height:0%"></div></div>
+            <span class="freq-value" id="midVal">0</span>
+            <span class="freq-label">MID</span>
+        </div>
+        <div class="freq-item">
+            <div class="freq-bar-wrap"><div class="freq-bar-fill" id="trebleBar" style="background:#4488ff;height:0%"></div></div>
+            <span class="freq-value" id="trebleVal">0</span>
+            <span class="freq-label">TREBLE</span>
         </div>
     </div>
+    <div class="controls">
+        <button class="btn active" data-style="bars">BARS</button>
+        <button class="btn" data-style="circle">CIRCLE</button>
+        <button class="btn" data-style="wave">WAVE</button>
+        <button class="btn" data-style="particles">PARTICLES</button>
+        <button class="btn" data-style="sphere">3D SPHERE</button>
+        <div class="color-btns">
+            <div class="color-btn active" data-color="rainbow" style="background:linear-gradient(135deg,red,yellow,green,blue,violet)"></div>
+            <div class="color-btn" data-color="fire" style="background:linear-gradient(135deg,#ff0000,#ff8800)"></div>
+            <div class="color-btn" data-color="ocean" style="background:linear-gradient(135deg,#0044ff,#00ffcc)"></div>
+            <div class="color-btn" data-color="neon" style="background:linear-gradient(135deg,#ff00ff,#00ffff)"></div>
+            <div class="color-btn" data-color="gold" style="background:linear-gradient(135deg,#ffd700,#ff8800)"></div>
+        </div>
+        <button class="upload-btn" onclick="document.getElementById('fileInput').click()">▶ MÜZİK YÜKLE</button>
+    </div>
+</div>
 
-    <input type="file" id="fileInput" accept="audio/*">
+<input type="file" id="fileInput" accept="audio/*">
 
-    <script>
-        const canvas = document.getElementById("canvas")
-        const ctx = canvas.getContext("2d")
-        const beatFlash = document.getElementById("beatFlash")
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ==================== THREE.JS SETUP ====================
+const threeCanvas = document.createElement('canvas')
+threeCanvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1'
+document.body.insertBefore(threeCanvas, document.getElementById('canvas'))
 
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight
+const renderer = new THREE.WebGLRenderer({ canvas: threeCanvas, antialias: true, alpha: true })
+renderer.setSize(window.innerWidth, window.innerHeight)
+renderer.setPixelRatio(window.devicePixelRatio)
 
-        window.addEventListener("resize", () => {
-            canvas.width = window.innerWidth
-            canvas.height = window.innerHeight
+const scene = new THREE.Scene()
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+camera.position.z = 5
+
+// Sphere
+const sphereGeo = new THREE.SphereGeometry(2, 64, 64)
+const sphereMat = new THREE.MeshPhongMaterial({
+    color: 0x1a1a2e,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.6
+})
+const sphere = new THREE.Mesh(sphereGeo, sphereMat)
+scene.add(sphere)
+
+// Inner sphere
+const innerGeo = new THREE.SphereGeometry(1.5, 32, 32)
+const innerMat = new THREE.MeshPhongMaterial({
+    color: 0x6366f1,
+    transparent: true,
+    opacity: 0.2
+})
+const innerSphere = new THREE.Mesh(innerGeo, innerMat)
+scene.add(innerSphere)
+
+// Particles 3D
+const particleCount = 2000
+const particleGeo = new THREE.BufferGeometry()
+const positions = new Float32Array(particleCount * 3)
+const particleSizes = new Float32Array(particleCount)
+
+for (let i = 0; i < particleCount; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 20
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 20
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 20
+    particleSizes[i] = Math.random() * 2
+}
+
+particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+particleGeo.setAttribute('size', new THREE.BufferAttribute(particleSizes, 1))
+
+const particleMat = new THREE.PointsMaterial({
+    color: 0x6366f1,
+    size: 0.05,
+    transparent: true,
+    opacity: 0.6
+})
+
+const particleSystem = new THREE.Points(particleGeo, particleMat)
+scene.add(particleSystem)
+
+// Lights
+const ambientLight = new THREE.AmbientLight(0x404040, 2)
+scene.add(ambientLight)
+
+const pointLight1 = new THREE.PointLight(0x6366f1, 3, 20)
+pointLight1.position.set(5, 5, 5)
+scene.add(pointLight1)
+
+const pointLight2 = new THREE.PointLight(0xec4899, 3, 20)
+pointLight2.position.set(-5, -5, -5)
+scene.add(pointLight2)
+
+// Rings
+const rings = []
+for (let i = 0; i < 5; i++) {
+    const ringGeo = new THREE.TorusGeometry(2.5 + i * 0.3, 0.01, 8, 100)
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x6366f1, transparent: true, opacity: 0.3 })
+    const ring = new THREE.Mesh(ringGeo, ringMat)
+    ring.rotation.x = Math.random() * Math.PI
+    ring.rotation.y = Math.random() * Math.PI
+    scene.add(ring)
+    rings.push(ring)
+}
+
+window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+})
+
+// ==================== 2D CANVAS ====================
+const canvas = document.getElementById("canvas")
+canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none'
+const ctx = canvas.getContext("2d")
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+})
+
+// ==================== AUDIO ====================
+let audioCtx, analyser, source, dataArray, bufferLength
+let isPlaying = false
+let currentStyle = "bars"
+let colorTheme = "rainbow"
+let hue = 0
+let particles2D = []
+let lastBass = 0
+let beatCooldown = 0
+
+class Particle2D {
+    constructor(x, y, color) {
+        this.x = x; this.y = y; this.color = color
+        this.size = Math.random() * 4 + 1
+        this.speedX = (Math.random() - 0.5) * 6
+        this.speedY = (Math.random() - 0.5) * 6 - 2
+        this.life = 1
+        this.decay = Math.random() * 0.02 + 0.01
+    }
+    update() {
+        this.x += this.speedX; this.y += this.speedY
+        this.speedY += 0.1; this.life -= this.decay; this.size *= 0.99
+    }
+    draw() {
+        ctx.globalAlpha = this.life
+        ctx.fillStyle = this.color
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.globalAlpha = 1
+    }
+}
+
+function getColor(i, total, alpha = 1) {
+    const t = i / total
+    switch(colorTheme) {
+        case "rainbow": return `hsla(${(hue + t * 360) % 360},100%,60%,${alpha})`
+        case "fire": return `hsla(${t * 60},100%,60%,${alpha})`
+        case "ocean": return `hsla(${200 + t * 60},100%,60%,${alpha})`
+        case "neon": return `hsla(${280 + t * 80},100%,65%,${alpha})`
+        case "gold": return `hsla(${40 + t * 20},100%,${50 + t * 20}%,${alpha})`
+        default: return `hsla(${hue},100%,60%,${alpha})`
+    }
+}
+
+function getThreeColor() {
+    switch(colorTheme) {
+        case "rainbow": return new THREE.Color(`hsl(${hue},100%,60%)`)
+        case "fire": return new THREE.Color(0xff4400)
+        case "ocean": return new THREE.Color(0x0088ff)
+        case "neon": return new THREE.Color(0xff00ff)
+        case "gold": return new THREE.Color(0xffd700)
+        default: return new THREE.Color(`hsl(${hue},100%,60%)`)
+    }
+}
+
+function drawBars() {
+    const w = canvas.width, h = canvas.height
+    const barWidth = (w / bufferLength) * 2.2
+    let x = 0
+    for (let i = 0; i < bufferLength; i++) {
+        const barHeight = (dataArray[i] / 255) * h * 0.75
+        ctx.shadowColor = getColor(i, bufferLength)
+        ctx.shadowBlur = 10
+        ctx.fillStyle = getColor(i, bufferLength)
+        ctx.fillRect(x, h - barHeight, barWidth - 1, barHeight)
+        ctx.globalAlpha = 0.1
+        ctx.fillRect(x, 0, barWidth - 1, barHeight * 0.2)
+        ctx.globalAlpha = 1
+        x += barWidth
+    }
+    ctx.shadowBlur = 0
+}
+
+function drawCircle() {
+    const cx = canvas.width / 2, cy = canvas.height / 2
+    const radius = Math.min(canvas.width, canvas.height) * 0.22
+    const avg = dataArray.reduce((a, b) => a + b, 0) / bufferLength
+    for (let i = 0; i < bufferLength; i++) {
+        const angle = (i / bufferLength) * Math.PI * 2 - Math.PI / 2
+        const amp = (dataArray[i] / 255) * radius
+        const x1 = cx + Math.cos(angle) * radius
+        const y1 = cy + Math.sin(angle) * radius
+        const x2 = cx + Math.cos(angle) * (radius + amp)
+        const y2 = cy + Math.sin(angle) * (radius + amp)
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2)
+        ctx.strokeStyle = getColor(i, bufferLength)
+        ctx.lineWidth = 2
+        ctx.shadowColor = getColor(i, bufferLength)
+        ctx.shadowBlur = 5
+        ctx.stroke()
+    }
+    ctx.shadowBlur = 0
+    ctx.beginPath()
+    ctx.arc(cx, cy, radius * 0.25 + avg * 0.15, 0, Math.PI * 2)
+    ctx.fillStyle = getColor(0, 1, 0.3)
+    ctx.fill()
+}
+
+function drawWave() {
+    const w = canvas.width, h = canvas.height
+    for (let layer = 0; layer < 3; layer++) {
+        const sliceWidth = w / bufferLength
+        let x = 0
+        ctx.beginPath()
+        for (let i = 0; i < bufferLength; i++) {
+            const v = dataArray[i] / 128.0
+            const y = (v * h * 0.4) + h * (0.3 + layer * 0.15)
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
+            x += sliceWidth
+        }
+        const grad = ctx.createLinearGradient(0, 0, w, 0)
+        grad.addColorStop(0, getColor(0, 3, 0.8 - layer * 0.2))
+        grad.addColorStop(0.5, getColor(1, 3, 0.8 - layer * 0.2))
+        grad.addColorStop(1, getColor(2, 3, 0.8 - layer * 0.2))
+        ctx.strokeStyle = grad
+        ctx.lineWidth = 3 - layer
+        ctx.shadowColor = getColor(layer, 3)
+        ctx.shadowBlur = 10
+        ctx.stroke()
+    }
+    ctx.shadowBlur = 0
+}
+
+function drawParticles() {
+    const w = canvas.width, h = canvas.height
+    const avg = dataArray.reduce((a, b) => a + b, 0) / bufferLength
+    for (let i = 0; i < bufferLength; i += 4) {
+        if (dataArray[i] > 150) {
+            const x = (i / bufferLength) * w
+            const intensity = dataArray[i] / 255
+            particles2D.push(new Particle2D(x + (Math.random() - 0.5) * 50, h - intensity * h * 0.6, getColor(i, bufferLength)))
+        }
+    }
+    if (avg > 100) {
+        for (let j = 0; j < 3; j++) {
+            particles2D.push(new Particle2D(w / 2 + (Math.random() - 0.5) * 100, h / 2 + (Math.random() - 0.5) * 100, getColor(Math.random() * 100, 100)))
+        }
+    }
+    particles2D = particles2D.filter(p => p.life > 0)
+    particles2D.forEach(p => { p.update(); p.draw() })
+}
+
+function updateFreqBars() {
+    if (!dataArray) return
+    const bass = Math.round(dataArray.slice(0, 5).reduce((a, b) => a + b) / 5)
+    const mid = Math.round(dataArray.slice(5, 50).reduce((a, b) => a + b) / 45)
+    const treble = Math.round(dataArray.slice(50).reduce((a, b) => a + b) / (bufferLength - 50))
+    document.getElementById("bassBar").style.height = (bass / 255 * 100) + "%"
+    document.getElementById("midBar").style.height = (mid / 255 * 100) + "%"
+    document.getElementById("trebleBar").style.height = (treble / 255 * 100) + "%"
+    document.getElementById("bassVal").textContent = bass
+    document.getElementById("midVal").textContent = mid
+    document.getElementById("trebleVal").textContent = treble
+    if (bass > 180 && bass > lastBass * 1.3 && beatCooldown <= 0) {
+        document.getElementById("beatFlash").style.background = "rgba(255,255,255,0.06)"
+        setTimeout(() => document.getElementById("beatFlash").style.background = "rgba(255,255,255,0)", 80)
+        beatCooldown = 15
+    }
+    if (beatCooldown > 0) beatCooldown--
+    lastBass = bass
+    return { bass, mid, treble }
+}
+
+let time = 0
+
+function animate() {
+    requestAnimationFrame(animate)
+    time += 0.01
+    hue = (hue + 0.4) % 360
+
+    // Three.js 3D render
+    const threeColor = getThreeColor()
+    sphere.material.color = threeColor
+    pointLight1.color = threeColor
+    sphere.rotation.x += 0.003
+    sphere.rotation.y += 0.005
+    innerSphere.rotation.x -= 0.002
+    innerSphere.rotation.y -= 0.003
+    particleSystem.rotation.y += 0.001
+    particleSystem.rotation.x += 0.0005
+
+    rings.forEach((ring, i) => {
+        ring.rotation.x += 0.002 * (i + 1)
+        ring.rotation.z += 0.001 * (i + 1)
+    })
+
+    if (isPlaying && analyser) {
+        analyser.getByteFrequencyData(dataArray)
+        const { bass, mid, treble } = updateFreqBars() || {}
+        const bassNorm = (bass || 0) / 255
+        const midNorm = (mid || 0) / 255
+
+        // React to music
+        const scale = 1 + bassNorm * 0.4
+        sphere.scale.setScalar(scale)
+        innerSphere.scale.setScalar(1 + midNorm * 0.3)
+        pointLight1.intensity = 2 + bassNorm * 8
+        pointLight2.intensity = 2 + midNorm * 6
+
+        rings.forEach((ring, i) => {
+            ring.rotation.x += bassNorm * 0.05
+            ring.rotation.y += midNorm * 0.03
+            ring.material.opacity = 0.1 + bassNorm * 0.5
         })
 
-        let audioCtx, analyser, source, dataArray, bufferLength
-        let currentStyle = "bars"
-        let colorTheme = "rainbow"
-        let hue = 0
-        let isPlaying = false
-        let particles = []
-        let lastBass = 0
-        let beatCooldown = 0
+        particleSystem.material.size = 0.05 + bassNorm * 0.1
+        particleSystem.material.opacity = 0.4 + midNorm * 0.4
+    } else {
+        sphere.scale.setScalar(1 + Math.sin(time) * 0.05)
+        rings.forEach((ring, i) => {
+            ring.material.opacity = 0.1 + Math.sin(time + i) * 0.05
+        })
+    }
 
-        // Particles
-        class Particle {
-            constructor(x, y, color) {
-                this.x = x
-                this.y = y
-                this.color = color
-                this.size = Math.random() * 4 + 1
-                this.speedX = (Math.random() - 0.5) * 6
-                this.speedY = (Math.random() - 0.5) * 6 - 2
-                this.life = 1
-                this.decay = Math.random() * 0.02 + 0.01
-            }
-            update() {
-                this.x += this.speedX
-                this.y += this.speedY
-                this.speedY += 0.1
-                this.life -= this.decay
-                this.size *= 0.99
-            }
-            draw() {
-                ctx.globalAlpha = this.life
-                ctx.fillStyle = this.color
-                ctx.beginPath()
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
-                ctx.fill()
-                ctx.globalAlpha = 1
-            }
-        }
+    renderer.render(scene, camera)
 
-        function getColor(i, total, alpha = 1) {
-            const t = i / total
-            switch(colorTheme) {
-                case "rainbow":
-                    return `hsla(${(hue + t * 360) % 360}, 100%, 60%, ${alpha})`
-                case "fire":
-                    return `hsla(${t * 60}, 100%, 60%, ${alpha})`
-                case "ocean":
-                    return `hsla(${200 + t * 60}, 100%, 60%, ${alpha})`
-                case "neon":
-                    return `hsla(${280 + t * 80}, 100%, 65%, ${alpha})`
-                case "gold":
-                    return `hsla(${40 + t * 20}, 100%, ${50 + t * 20}%, ${alpha})`
-                default:
-                    return `hsla(${hue}, 100%, 60%, ${alpha})`
-            }
-        }
-
-        function drawBars() {
-            const w = canvas.width
-            const h = canvas.height
-            const barWidth = (w / bufferLength) * 2.2
-            let x = 0
-
-            for (let i = 0; i < bufferLength; i++) {
-                const barHeight = (dataArray[i] / 255) * h * 0.75
-                ctx.fillStyle = getColor(i, bufferLength)
-                ctx.fillRect(x, h - barHeight, barWidth - 1, barHeight)
-
-                // Glow
-                ctx.shadowColor = getColor(i, bufferLength)
-                ctx.shadowBlur = 8
-                ctx.fillRect(x, h - barHeight, barWidth - 1, barHeight)
-                ctx.shadowBlur = 0
-
-                // Mirror top
-                ctx.globalAlpha = 0.15
-                ctx.fillRect(x, 0, barWidth - 1, barHeight * 0.2)
-                ctx.globalAlpha = 1
-
-                x += barWidth
-            }
-        }
-
-        function drawCircle() {
-            const cx = canvas.width / 2
-            const cy = canvas.height / 2
-            const radius = Math.min(canvas.width, canvas.height) * 0.22
-            const avg = dataArray.reduce((a, b) => a + b, 0) / bufferLength
-
-            // Outer rings
-            for (let r = 0; r < 3; r++) {
-                ctx.beginPath()
-                ctx.arc(cx, cy, radius * (0.8 + r * 0.15) + avg * 0.1, 0, Math.PI * 2)
-                ctx.strokeStyle = getColor(r * 30, 100, 0.1)
-                ctx.lineWidth = 1
-                ctx.stroke()
-            }
-
-            for (let i = 0; i < bufferLength; i++) {
-                const angle = (i / bufferLength) * Math.PI * 2 - Math.PI / 2
-                const amp = (dataArray[i] / 255) * radius
-                const x1 = cx + Math.cos(angle) * radius
-                const y1 = cy + Math.sin(angle) * radius
-                const x2 = cx + Math.cos(angle) * (radius + amp)
-                const y2 = cy + Math.sin(angle) * (radius + amp)
-
-                ctx.beginPath()
-                ctx.moveTo(x1, y1)
-                ctx.lineTo(x2, y2)
-                ctx.strokeStyle = getColor(i, bufferLength)
-                ctx.lineWidth = 2
-                ctx.shadowColor = getColor(i, bufferLength)
-                ctx.shadowBlur = 5
-                ctx.stroke()
-                ctx.shadowBlur = 0
-
-                // Mirror
-                const x3 = cx - Math.cos(angle) * radius
-                const y3 = cy - Math.sin(angle) * radius
-                const x4 = cx - Math.cos(angle) * (radius + amp * 0.5)
-                const y4 = cy - Math.sin(angle) * (radius + amp * 0.5)
-                ctx.globalAlpha = 0.3
-                ctx.beginPath()
-                ctx.moveTo(x3, y3)
-                ctx.lineTo(x4, y4)
-                ctx.stroke()
-                ctx.globalAlpha = 1
-            }
-
-            // Center
-            ctx.beginPath()
-            ctx.arc(cx, cy, radius * 0.25 + avg * 0.15, 0, Math.PI * 2)
-            ctx.fillStyle = getColor(0, 1, 0.3)
-            ctx.fill()
-            ctx.strokeStyle = getColor(0, 1, 0.8)
-            ctx.lineWidth = 2
-            ctx.stroke()
-        }
-
-        function drawWave() {
-            const w = canvas.width
-            const h = canvas.height
-
-            for (let layer = 0; layer < 3; layer++) {
-                const sliceWidth = w / bufferLength
-                let x = 0
-
-                ctx.beginPath()
-                for (let i = 0; i < bufferLength; i++) {
-                    const v = dataArray[i] / 128.0
-                    const y = (v * h * 0.4) + h * (0.3 + layer * 0.15)
-                    if (i === 0) ctx.moveTo(x, y)
-                    else ctx.lineTo(x, y)
-                    x += sliceWidth
-                }
-
-                const grad = ctx.createLinearGradient(0, 0, w, 0)
-                grad.addColorStop(0, getColor(0, 3, 0.8 - layer * 0.2))
-                grad.addColorStop(0.5, getColor(1, 3, 0.8 - layer * 0.2))
-                grad.addColorStop(1, getColor(2, 3, 0.8 - layer * 0.2))
-
-                ctx.strokeStyle = grad
-                ctx.lineWidth = 3 - layer
-                ctx.shadowColor = getColor(layer, 3)
-                ctx.shadowBlur = 10
-                ctx.stroke()
-                ctx.shadowBlur = 0
-            }
-        }
-
-        function drawParticles() {
-            const w = canvas.width
-            const h = canvas.height
-            const avg = dataArray.reduce((a, b) => a + b, 0) / bufferLength
-
-            // Spawn particles based on frequency
-            for (let i = 0; i < bufferLength; i += 4) {
-                if (dataArray[i] > 150) {
-                    const x = (i / bufferLength) * w
-                    const intensity = dataArray[i] / 255
-                    particles.push(new Particle(
-                        x + (Math.random() - 0.5) * 50,
-                        h - intensity * h * 0.6,
-                        getColor(i, bufferLength)
-                    ))
-                }
-            }
-
-            // Center burst on beat
-            if (avg > 100) {
-                for (let j = 0; j < 3; j++) {
-                    particles.push(new Particle(
-                        w / 2 + (Math.random() - 0.5) * 100,
-                        h / 2 + (Math.random() - 0.5) * 100,
-                        getColor(Math.random() * 100, 100)
-                    ))
-                }
-            }
-
-            // Update and draw
-            particles = particles.filter(p => p.life > 0)
-            particles.forEach(p => {
-                p.update()
-                p.draw()
-            })
-
-            // Background bars subtle
-            const barWidth = (w / bufferLength) * 2.2
-            let x = 0
-            for (let i = 0; i < bufferLength; i++) {
-                const barHeight = (dataArray[i] / 255) * h * 0.3
-                ctx.globalAlpha = 0.2
-                ctx.fillStyle = getColor(i, bufferLength)
-                ctx.fillRect(x, h - barHeight, barWidth - 1, barHeight)
-                ctx.globalAlpha = 1
-                x += barWidth
-            }
-        }
-
-        function updateFreqBars() {
-            if (!dataArray) return
-            const bass = Math.round(dataArray.slice(0, 5).reduce((a, b) => a + b) / 5)
-            const mid = Math.round(dataArray.slice(5, 50).reduce((a, b) => a + b) / 45)
-            const treble = Math.round(dataArray.slice(50).reduce((a, b) => a + b) / (bufferLength - 50))
-
-            document.getElementById("bassBar").style.height = (bass / 255 * 100) + "%"
-            document.getElementById("midBar").style.height = (mid / 255 * 100) + "%"
-            document.getElementById("trebleBar").style.height = (treble / 255 * 100) + "%"
-            document.getElementById("bassVal").textContent = bass
-            document.getElementById("midVal").textContent = mid
-            document.getElementById("trebleVal").textContent = treble
-
-            // Beat detection
-            if (bass > 180 && bass > lastBass * 1.3 && beatCooldown <= 0) {
-                beatFlash.style.background = "rgba(255,255,255,0.06)"
-                setTimeout(() => beatFlash.style.background = "rgba(255,255,255,0)", 80)
-                beatCooldown = 15
-            }
-            if (beatCooldown > 0) beatCooldown--
-            lastBass = bass
-        }
-
-        function drawIdle() {
-            const cx = canvas.width / 2
-            const cy = canvas.height / 2
-            hue = (hue + 0.3) % 360
-
-            ctx.beginPath()
-            ctx.arc(cx, cy, 80 + Math.sin(Date.now() * 0.002) * 10, 0, Math.PI * 2)
-            ctx.strokeStyle = `hsla(${hue}, 60%, 50%, 0.3)`
-            ctx.lineWidth = 1
-            ctx.stroke()
-
-            ctx.fillStyle = `hsla(${hue}, 60%, 70%, 0.5)`
-            ctx.font = "0.65rem 'Courier New'"
-            ctx.textAlign = "center"
-            ctx.fillText("MÜZİK YÜKLE", cx, cy + 5)
-        }
-
-        function animate() {
-            requestAnimationFrame(animate)
-            ctx.fillStyle = "rgba(0, 0, 0, 0.12)"
-            ctx.fillRect(0, 0, canvas.width, canvas.height)
-            hue = (hue + 0.4) % 360
-
-            if (!isPlaying || !analyser) {
-                drawIdle()
-                return
-            }
-
-            analyser.getByteFrequencyData(dataArray)
-            updateFreqBars()
-
+    // 2D canvas
+    if (currentStyle !== "sphere") {
+        ctx.fillStyle = "rgba(0,0,0,0.12)"
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        if (isPlaying && analyser) {
             if (currentStyle === "bars") drawBars()
             else if (currentStyle === "circle") drawCircle()
             else if (currentStyle === "wave") drawWave()
             else if (currentStyle === "particles") drawParticles()
         }
+    } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+    }
+}
 
-        // File input
-        document.getElementById("fileInput").addEventListener("change", (e) => {
-            const file = e.target.files[0]
-            if (!file) return
-
-            document.getElementById("trackName").textContent =
-                file.name.replace(/\.[^/.]+$/, "").toUpperCase()
-
-            if (audioCtx) audioCtx.close()
-            particles = []
-
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-            analyser = audioCtx.createAnalyser()
-            analyser.fftSize = 256
-            bufferLength = analyser.frequencyBinCount
-            dataArray = new Uint8Array(bufferLength)
-
-            const reader = new FileReader()
-            reader.onload = (ev) => {
-                audioCtx.decodeAudioData(ev.target.result, (buffer) => {
-                    if (source) source.disconnect()
-                    source = audioCtx.createBufferSource()
-                    source.buffer = buffer
-                    source.connect(analyser)
-                    analyser.connect(audioCtx.destination)
-                    source.start(0)
-                    isPlaying = true
-                })
-            }
-            reader.readAsArrayBuffer(file)
+// File input
+document.getElementById("fileInput").addEventListener("change", (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    document.getElementById("trackName").textContent = file.name.replace(/\.[^/.]+$/, "").toUpperCase()
+    if (audioCtx) audioCtx.close()
+    particles2D = []
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+    analyser = audioCtx.createAnalyser()
+    analyser.fftSize = 256
+    bufferLength = analyser.frequencyBinCount
+    dataArray = new Uint8Array(bufferLength)
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+        audioCtx.decodeAudioData(ev.target.result, (buffer) => {
+            if (source) source.disconnect()
+            source = audioCtx.createBufferSource()
+            source.buffer = buffer
+            source.connect(analyser)
+            analyser.connect(audioCtx.destination)
+            source.start(0)
+            isPlaying = true
         })
+    }
+    reader.readAsArrayBuffer(file)
+})
 
-        // Style buttons
-        document.querySelectorAll("[data-style]").forEach(btn => {
-            btn.addEventListener("click", () => {
-                document.querySelectorAll("[data-style]").forEach(b => b.classList.remove("active"))
-                btn.classList.add("active")
-                currentStyle = btn.dataset.style
-                particles = []
-            })
-        })
+document.querySelectorAll("[data-style]").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-style]").forEach(b => b.classList.remove("active"))
+        btn.classList.add("active")
+        currentStyle = btn.dataset.style
+        particles2D = []
+    })
+})
 
-        // Color buttons
-        document.querySelectorAll("[data-color]").forEach(btn => {
-            btn.addEventListener("click", () => {
-                document.querySelectorAll("[data-color]").forEach(b => b.classList.remove("active"))
-                btn.classList.add("active")
-                colorTheme = btn.dataset.color
-            })
-        })
+document.querySelectorAll("[data-color]").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-color]").forEach(b => b.classList.remove("active"))
+        btn.classList.add("active")
+        colorTheme = btn.dataset.color
+    })
+})
 
-        // Fullscreen
-        document.getElementById("fullscreenBtn").addEventListener("click", () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen()
-                document.getElementById("fullscreenBtn").textContent = "✕"
-            } else {
-                document.exitFullscreen()
-                document.getElementById("fullscreenBtn").textContent = "⛶"
-            }
-        })
+document.getElementById("fullscreenBtn").addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen()
+        document.getElementById("fullscreenBtn").textContent = "✕"
+    } else {
+        document.exitFullscreen()
+        document.getElementById("fullscreenBtn").textContent = "⛶"
+    }
+})
 
-        animate()
-    </script>
+animate()
+</script>
 </body>
 </html>
